@@ -1,0 +1,3 @@
+32 light_tex2.png earth2.png
+
+need lodepng from:  https://lodev.org/lodepng/
