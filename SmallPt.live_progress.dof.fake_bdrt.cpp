@@ -350,10 +350,20 @@ Vec radiance(std::vector<pay_load_t>& light_path_fifo, const Ray& r, int depth, 
             Vec rxx = r.d;
             double  cos_theta = nl.norm().dot(rxx.norm());
             if (cos_theta < 0) cos_theta = -cos_theta;
+#if 0
             BDRT_e = BDRT_e + light_path_fifo[ix].lit.mult(f) * cos_theta * (0.008 / (light_path_fifo.size() * M_PI * M_PI));
+#else
+            Vec vvv2 = x - r.o;
+            BDRT_e = BDRT_e + light_path_fifo[ix].lit.mult(f) * (1.0/ (light_path_fifo.size()));
+#endif
         }
         //continue recursive tracing
+#if 0
         return get_obj_e(obj, x) * E + e + BDRT_e + f.mult(radiance(light_path_fifo, Ray(x, d), depth, Xi, 0));
+#else
+        double probxxx = light_path_fifo.size() ? 0.5 : 0.0;
+        return get_obj_e(obj, x) * E + e + BDRT_e * probxxx + f.mult(radiance(light_path_fifo, Ray(x, d), depth, Xi, 0)) * (1- probxxx);
+#endif
 #endif
     }
     else if (mat_property == SPEC)              // Ideal SPECULAR reflection
@@ -518,7 +528,9 @@ int main(int argc, char* argv[]) {
     int en_bdrt = (argc >= 6) ? atoi(argv[5]) : 0;
     if (!en_bdrt)
     {
+#if 0
         spheres[light_id].e = Vec(4, 4, 4) * 118;//adjust brightness since BDRT will be brighter
+#endif
     }
     //
     light_tex.load_image(argv[2]);
@@ -585,10 +597,11 @@ int main(int argc, char* argv[]) {
                                         unsigned short us = 0;
                                         if (en_bdrt)
                                         {
+#define _LIT_SAMPLE_FACTOR_ (0.0013 * M_1_PI) //use the random sample tech in radiance()'s DIFF (Direct light sampling) later
                                             double r1 = 2 * M_PI * erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
                                             Vec w = Vec(0, 1, 0), u = ((fabs(w.x) > .1 ? Vec(0, 1) : Vec(1)) % w).norm(), v = w % u;
                                             Vec lit_d = (u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1 - r2)).norm();
-                                            light_radiance(light_path_fifo, spheres[light_id].e, Ray(spheres[light_id].p + lit_d * (spheres[light_id].rad + 0.1), lit_d), 0, &us);
+                                            light_radiance(light_path_fifo, spheres[light_id].e * (_LIT_SAMPLE_FACTOR_), Ray(spheres[light_id].p + lit_d * (spheres[light_id].rad + 0.1), lit_d), 0, &us);
                                         }
                                         //
                                         r = r + radiance(light_path_fifo, Ray(image_plane_hit + new_dir * -60, new_dir.norm()), 0, Xi) * (1. / samps);
