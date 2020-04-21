@@ -1,0 +1,3 @@
+﻿https://github.com/junanita/Bidirectional_Path_Tracing
+ 
+https://www.cnblogs.com/starfallen/p/3509234.html
