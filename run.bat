@@ -1,0 +1,1 @@
+Smallpt.exe 1024 light_tex2.png earth2.png 0 0

@@ -5,3 +5,5 @@ need lodepng from:  https://lodev.org/lodepng/
 for SmallPt.dof.live_progress_opengl.cpp,  add new parameter to control the DOF effect (Aperture)
 
 32 light_tex2.png earth2.png [0-n]
+
+for fake BDRT, [0-1] enable fake BDRT
